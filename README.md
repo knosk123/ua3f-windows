@@ -37,3 +37,7 @@ go build -ldflags "-s -w" -o ua3f-win.exe
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\build.ps1
 ```
+
+## 页面样式
+
+<img width="2557" height="1391" alt="图片" src="https://github.com/user-attachments/assets/a075a74a-a161-4cd3-9d2f-cdf13e35b35e" />
