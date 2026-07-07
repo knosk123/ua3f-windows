@@ -1,0 +1,4 @@
+github.com/williamfhe/godivert v0.0.0-20181229124620-a48c5b872c73 h1:uTcyLPxotESVvsf6sWcw+6MyDAsuuI7Q2TJn+pWyt/c=
+github.com/williamfhe/godivert v0.0.0-20181229124620-a48c5b872c73/go.mod h1:2A+pcb3S0puG6gpwq2d8+7HGgCWXyCBwnsv/n3abx4U=
+golang.org/x/sys v0.46.0 h1:noSf2Fq6F8DBgS+LysIkx7rIExoNHJsxOAtPp4rthXw=
+golang.org/x/sys v0.46.0/go.mod h1:4GL1E5IUh+htKOUEOaiffhrAeqysfVGipDYzABqnCmw=

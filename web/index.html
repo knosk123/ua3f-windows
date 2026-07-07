@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UA3F 控制台</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">UA3F for Windows 11</p>
+        <h1>本地热点流量改写控制台</h1>
+        <p class="subcopy">双击即可启动，页面里直接管理 UA、TTL、端口与运行状态。</p>
+      </div>
+      <div class="status-card">
+        <span class="label">当前状态</span>
+        <strong id="statusText">idle</strong>
+        <span id="statusMeta" class="meta">等待启动</span>
+      </div>
+    </section>
+
+    <main class="grid">
+      <section class="panel form-panel">
+        <div class="panel-head">
+          <h2>运行配置</h2>
+          <p>保存后，下次双击会继续沿用。</p>
+        </div>
+
+        <label>
+          <span>预设</span>
+          <select id="preset">
+            <option value="wechat">wechat</option>
+            <option value="pc">pc</option>
+          </select>
+        </label>
+
+        <label>
+          <span>User-Agent preview</span>
+          <textarea id="ua" rows="4" readonly></textarea>
+        </label>
+
+        <div class="two-col">
+          <label>
+            <span>TTL</span>
+            <input id="ttl" type="number" min="1" max="255">
+          </label>
+
+          <label>
+            <span>日志级别</span>
+            <select id="log">
+              <option value="info">info</option>
+              <option value="debug">debug</option>
+              <option value="warn">warn</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          <span>端口</span>
+          <input id="ports" type="text" placeholder="80,8080">
+        </label>
+
+        <div class="actions">
+          <button id="saveBtn" class="secondary">保存配置</button>
+          <button id="startBtn" class="primary">启动改写</button>
+          <button id="stopBtn" class="danger">停止改写</button>
+        </div>
+      </section>
+
+      <section class="panel stats-panel">
+        <div class="panel-head">
+          <h2>运行概览</h2>
+          <p>实时轮询本地服务状态。</p>
+        </div>
+
+        <div class="stats">
+          <article>
+            <span>数据包</span>
+            <strong id="packetCount">0</strong>
+          </article>
+          <article>
+            <span>TTL 改写</span>
+            <strong id="ttlCount">0</strong>
+          </article>
+          <article>
+            <span>UA 改写</span>
+            <strong id="uaCount">0</strong>
+          </article>
+        </div>
+
+        <div class="tips">
+          <h3>说明</h3>
+          <ul>
+            <li>仅处理 IPv4 与明文 HTTP。</li>
+            <li>HTTPS 默认不会改写 UA。</li>
+            <li>WinDivert 运行需要管理员权限。</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="panel logs-panel">
+        <div class="panel-head">
+          <h2>实时日志</h2>
+          <p>日志保留在内存中，刷新页面也能继续看到。</p>
+        </div>
+        <pre id="logs"></pre>
+      </section>
+    </main>
+  </div>
+
+  <script src="/assets/app.js"></script>
+</body>
+</html>
