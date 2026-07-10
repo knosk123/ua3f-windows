@@ -2,11 +2,12 @@ package main
 
 import (
 	"flag"
+	"strings"
 	"testing"
 )
 
 func TestParseFlagsSupportsPresetUA(t *testing.T) {
-	cfg, err := parseFlags([]string{"-ua", "pc", "-ports", "80,8080", "-ttl", "64"})
+	cfg, err := parseFlags([]string{"-ua", "pc", "-ttl", "64"})
 	if err != nil {
 		t.Fatalf("parseFlags returned error: %v", err)
 	}
@@ -17,15 +18,25 @@ func TestParseFlagsSupportsPresetUA(t *testing.T) {
 	if cfg.TTL != 64 {
 		t.Fatalf("expected TTL=64, got %d", cfg.TTL)
 	}
-	if len(cfg.UA_Ports) != 2 || cfg.UA_Ports[0] != 80 || cfg.UA_Ports[1] != 8080 {
-		t.Fatalf("unexpected ports: %#v", cfg.UA_Ports)
-	}
 }
 
 func TestParseFlagsRejectsTTLAbove255(t *testing.T) {
 	_, err := parseFlags([]string{"-ttl", "300"})
 	if err == nil {
 		t.Fatal("expected TTL range error, got nil")
+	}
+}
+
+func TestParseFlagsRejectsRemovedPortsOption(t *testing.T) {
+	_, err := parseFlags([]string{"-ports", "80"})
+	if err == nil {
+		t.Fatal("expected removed -ports option to be rejected")
+	}
+	if !strings.Contains(err.Error(), "ports") {
+		t.Fatalf("expected error to identify removed ports option, got %v", err)
+	}
+	if !strings.Contains(err.Error(), "no longer supported") {
+		t.Fatalf("expected error to explain that ports are detected automatically, got %v", err)
 	}
 }
 

@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"syscall"
 )
@@ -58,7 +57,7 @@ func main() {
 	app.state.AppendLog("[+] ui mode started")
 	launchLogger.Printf("app initialized")
 
-	server, url, err := startWebServer(app)
+	server, url, quit, err := startWebServer(app)
 	if err != nil {
 		launchLogger.Printf("web server start failed: %v", err)
 		log.Fatalf("[-] failed to start web server: %v", err)
@@ -76,7 +75,7 @@ func main() {
 	}
 
 	launchLogger.Printf("entering waitForShutdown")
-	waitForShutdown(server, app)
+	waitForShutdown(server, app, quit)
 }
 
 func shouldRunLegacyCLI(args []string) bool {
@@ -119,7 +118,6 @@ func runLegacyCLI() {
 		Preset: detectPresetKey(cfg.UA),
 		UA:     cfg.UA,
 		TTL:    cfg.TTL,
-		Ports:  joinPorts(cfg.UA_Ports),
 		Log:    cfg.Log,
 	}.Normalize()
 	state.SetConfig(appCfg)
@@ -135,12 +133,18 @@ func runLegacyCLI() {
 	_ = runner.Stop()
 }
 
-func waitForShutdown(server *http.Server, app *App) {
+func waitForShutdown(server *http.Server, app *App, quit <-chan struct{}) {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
-	<-sigCh
+	defer signal.Stop(sigCh)
 
-	launchLogger.Printf("shutdown signal received")
+	select {
+	case <-sigCh:
+		launchLogger.Printf("shutdown signal received")
+	case <-quit:
+		launchLogger.Printf("shutdown requested from web ui")
+	}
+
 	app.state.AppendLog("[*] shutdown requested")
 	_ = app.Stop()
 	_ = server.Close()
@@ -153,15 +157,4 @@ func detectPresetKey(ua string) string {
 		}
 	}
 	return "wechat"
-}
-
-func joinPorts(ports []uint16) string {
-	if len(ports) == 0 {
-		return "80"
-	}
-	parts := make([]string, 0, len(ports))
-	for _, port := range ports {
-		parts = append(parts, strconv.FormatUint(uint64(port), 10))
-	}
-	return strings.Join(parts, ",")
 }

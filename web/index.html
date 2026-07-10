@@ -12,12 +12,13 @@
       <div>
         <p class="eyebrow">UA3F for Windows 11</p>
         <h1>本地热点流量改写控制台</h1>
-        <p class="subcopy">双击即可启动，页面里直接管理 UA、TTL、端口与运行状态。</p>
+        <p class="subcopy">双击即可启动，页面里直接管理 UA、TTL 与运行状态。</p>
       </div>
-      <div class="status-card">
+      <div id="statusCard" class="status-card" data-status="idle">
         <span class="label">当前状态</span>
-        <strong id="statusText">idle</strong>
+        <strong id="statusText">已停止</strong>
         <span id="statusMeta" class="meta">等待启动</span>
+        <button id="exitBtn" class="exit-button" type="button">退出程序</button>
       </div>
     </section>
 
@@ -29,10 +30,10 @@
         </div>
 
         <label>
-          <span>预设</span>
+          <span>运行模式</span>
           <select id="preset">
-            <option value="wechat">wechat</option>
-            <option value="pc">pc</option>
+            <option value="wechat">手机模式</option>
+            <option value="pc">电脑模式</option>
           </select>
         </label>
 
@@ -45,6 +46,7 @@
           <label>
             <span>TTL</span>
             <input id="ttl" type="number" min="1" max="255">
+            <small id="ttlError" class="field-error"></small>
           </label>
 
           <label>
@@ -57,16 +59,12 @@
           </label>
         </div>
 
-        <label>
-          <span>端口</span>
-          <input id="ports" type="text" placeholder="80,8080">
-        </label>
-
         <div class="actions">
           <button id="saveBtn" class="secondary">保存配置</button>
           <button id="startBtn" class="primary">启动改写</button>
           <button id="stopBtn" class="danger">停止改写</button>
         </div>
+        <p id="actionNotice" class="action-notice" aria-live="polite"></p>
       </section>
 
       <section class="panel stats-panel">
@@ -94,6 +92,7 @@
           <h3>说明</h3>
           <ul>
             <li>仅处理 IPv4 与明文 HTTP。</li>
+            <li>自动检测所有 TCP 端口上的 HTTP 请求。</li>
             <li>HTTPS 默认不会改写 UA。</li>
             <li>WinDivert 运行需要管理员权限。</li>
           </ul>
@@ -110,6 +109,7 @@
     </main>
   </div>
 
+  <script src="/assets/ui.js"></script>
   <script src="/assets/app.js"></script>
 </body>
 </html>

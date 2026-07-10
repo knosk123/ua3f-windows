@@ -26,12 +26,7 @@ func NewRunner(exeDir string, state *AppState) *Runner {
 }
 
 func (r *Runner) Start(cfg AppConfig) error {
-	runtimeCfg, err := cfg.ToRuntimeConfig()
-	if err != nil {
-		r.state.SetStatus(StatusError, err.Error())
-		r.logf("[-] invalid config: %v", err)
-		return err
-	}
+	runtimeCfg := cfg.ToRuntimeConfig()
 
 	r.mu.Lock()
 	if r.running {

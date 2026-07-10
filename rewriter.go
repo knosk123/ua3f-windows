@@ -36,11 +36,6 @@ func rewrite(pkt *godivert.Packet, cfg *Config) (bool, bool) {
 		return ttlChanged, false
 	}
 
-	dstPort, err := tcp.DstPort()
-	if err != nil || !containsPort(cfg.UA_Ports, dstPort) {
-		return ttlChanged, false
-	}
-
 	ipHdrLen := int(ipHdr.HeaderLen())
 	tcpHdrLen := tcp.HeaderLen()
 	payloadStart := ipHdrLen + tcpHdrLen
@@ -75,15 +70,6 @@ func rewrite(pkt *godivert.Packet, cfg *Config) (bool, bool) {
 	recomputeIPChecksum(pkt.Raw[:ipHdrLen])
 
 	return ttlChanged, true
-}
-
-func containsPort(ports []uint16, port uint16) bool {
-	for _, candidate := range ports {
-		if candidate == port {
-			return true
-		}
-	}
-	return false
 }
 
 func looksLikeHTTPRequest(payload []byte) bool {

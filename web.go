@@ -6,17 +6,20 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"sync"
 )
 
-func startWebServer(app *App) (*http.Server, string, error) {
+func startWebServer(app *App) (*http.Server, string, <-chan struct{}, error) {
 	ln, err := net.Listen("tcp", "127.0.0.1:18080")
 	if err != nil {
 		ln, err = net.Listen("tcp", "127.0.0.1:0")
 		if err != nil {
-			return nil, "", err
+			return nil, "", nil, err
 		}
 	}
 
+	quit := make(chan struct{})
+	var quitOnce sync.Once
 	mux := http.NewServeMux()
 	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.FS(webStaticFS()))))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -73,6 +76,17 @@ func startWebServer(app *App) (*http.Server, string, error) {
 	mux.HandleFunc("/api/logs", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, app.Snapshot().Logs)
 	})
+	mux.HandleFunc("/api/quit", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
+		if flusher, ok := w.(http.Flusher); ok {
+			flusher.Flush()
+		}
+		quitOnce.Do(func() { close(quit) })
+	})
 
 	server := &http.Server{Handler: mux}
 	go func() {
@@ -80,7 +94,7 @@ func startWebServer(app *App) (*http.Server, string, error) {
 	}()
 
 	url := fmt.Sprintf("http://%s", ln.Addr().String())
-	return server, url, nil
+	return server, url, quit, nil
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) {

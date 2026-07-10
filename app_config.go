@@ -12,7 +12,6 @@ type AppConfig struct {
 	Preset string `json:"preset"`
 	UA     string `json:"ua"`
 	TTL    uint8  `json:"ttl"`
-	Ports  string `json:"ports"`
 	Log    string `json:"log"`
 }
 
@@ -21,7 +20,6 @@ func DefaultAppConfig() AppConfig {
 		Preset: "wechat",
 		UA:     presets["wechat"],
 		TTL:    64,
-		Ports:  "80",
 		Log:    "info",
 	}
 }
@@ -34,9 +32,6 @@ func (c AppConfig) Normalize() AppConfig {
 	out.Preset = strings.ToLower(strings.TrimSpace(out.Preset))
 	if out.TTL == 0 {
 		out.TTL = 64
-	}
-	if strings.TrimSpace(out.Ports) == "" {
-		out.Ports = "80"
 	}
 	out.Log = strings.ToLower(strings.TrimSpace(out.Log))
 	if out.Log == "" {
@@ -58,18 +53,13 @@ func (c AppConfig) EffectiveUA() string {
 	return c.Normalize().UA
 }
 
-func (c AppConfig) ToRuntimeConfig() (*Config, error) {
+func (c AppConfig) ToRuntimeConfig() *Config {
 	norm := c.Normalize()
-	ports, err := parsePorts(norm.Ports)
-	if err != nil {
-		return nil, err
-	}
 	return &Config{
-		TTL:      norm.TTL,
-		UA:       norm.EffectiveUA(),
-		UA_Ports: ports,
-		Log:      norm.Log,
-	}, nil
+		TTL: norm.TTL,
+		UA:  norm.EffectiveUA(),
+		Log: norm.Log,
+	}
 }
 
 func LoadAppConfig(path string) (AppConfig, error) {
