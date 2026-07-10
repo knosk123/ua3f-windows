@@ -14,11 +14,7 @@ Windows 11 amd64 上的 UA3F 重写版，生成单个 `ua3f-win.exe`。
 
 程序会自动检测所有 TCP 端口上的明文 HTTP 请求，无需配置端口。
 
-不再支持用户自定义 UA。`wechat` 当前为：
 
-```text
-Mozilla/5.0 (Linux; Android 15; RMX6688 Build/AP3A.240617.008; wv) AppleWebKit/537.36
-```
 
 ## 命令行
 
@@ -29,7 +25,7 @@ Mozilla/5.0 (Linux; Android 15; RMX6688 Build/AP3A.240617.008; wv) AppleWebKit/5
 .\ua3f-win.exe -ttl 65
 ```
 
-`-ua` 只接受 `wechat` 或 `pc`。`-ports` 已删除，HTTP 会在所有 TCP 端口上自动检测。
+HTTP 会在所有 TCP 端口上自动检测。
 
 ## 限制
 
